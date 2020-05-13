@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="activity_back_layout_id" type="id"/>
+    <item name="activity_title_id" type="id"/>
+    <item name="activity_menu_id" type="id"/>
+    <item name="xbanner_pointId" type="id" />
+</resources>
