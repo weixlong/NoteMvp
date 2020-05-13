@@ -29,7 +29,7 @@ public abstract class BaseFragment extends RxFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         onCreateBindViewBefore(savedInstanceState);
         View view = onCreateBindViewUpdate(onCreateBindViewLayoutId(savedInstanceState), savedInstanceState);
-        onCreateBindViewChanged(savedInstanceState);
+        onCreateBindViewChanged(savedInstanceState,view);
         return view;
     }
 
@@ -53,9 +53,9 @@ public abstract class BaseFragment extends RxFragment {
 
 
     /**
-     * 设置view 之后
+     * 获得view 之后
      */
-    protected abstract void onCreateBindViewChanged(@Nullable Bundle savedInstanceState);
+    protected abstract void onCreateBindViewChanged(@Nullable Bundle savedInstanceState,View layout);
 
 
     /**

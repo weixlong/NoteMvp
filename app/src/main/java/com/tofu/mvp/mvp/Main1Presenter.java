@@ -14,7 +14,6 @@ public class Main1Presenter implements Main1Contract.Presenter {
     @View
     MainContract.View view;
 
-
     @Model
     Main1Contract.Model model;
 

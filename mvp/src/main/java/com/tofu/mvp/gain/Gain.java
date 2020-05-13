@@ -63,7 +63,9 @@ public class Gain {
 
 
     /**
-     * 加载Gain生命周期跟随
+     * 加载Gain生命周期跟随,
+     * 当key为受管理的V层时，会跟随unbind一起释放，
+     * 如key不受管理时，请手动释放MvpNote.unBindLifecycle.
      * @param key 当前实现生命周期的实体class
      * @param attach 依赖的其他MVP里使用Gain的地方跟随key指向的生命周期
      */
