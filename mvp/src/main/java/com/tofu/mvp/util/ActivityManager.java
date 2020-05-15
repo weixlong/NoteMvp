@@ -20,7 +20,7 @@ public class ActivityManager {
         mActivityStack = new Stack<>();
     }
 
-    public static ActivityManager getInstance(){
+    public static ActivityManager getInstance() {
         return I.m;
     }
 
@@ -65,7 +65,7 @@ public class ActivityManager {
      */
     public void popActivity(Class<? extends Activity> klass) {
         Iterator<Activity> iterator = mActivityStack.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Activity activity = iterator.next();
             if (activity != null && activity.getClass().equals(klass)) {
                 iterator.remove();   //注意这个地方
@@ -78,7 +78,7 @@ public class ActivityManager {
 
     public Activity findActivity(Class<? extends Activity> klass) {
         Iterator<Activity> iterator = mActivityStack.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Activity activity = iterator.next();
             if (activity != null && activity.getClass().equals(klass)) {
                 return activity;
@@ -88,7 +88,7 @@ public class ActivityManager {
     }
 
 
-    public boolean cantains(Class<? extends Activity> klass){
+    public boolean cantains(Class<? extends Activity> klass) {
         for (Activity activity : mActivityStack) {
             if (activity != null && activity.getClass().equals(klass)) {
                 return true;
@@ -106,7 +106,7 @@ public class ActivityManager {
      *
      * @param klass 类名
      */
-    public void popActivitys(Class<? extends BaseActivity> ... klass) {
+    public void popActivitys(Class<? extends BaseActivity>... klass) {
         for (Class<? extends BaseActivity> aClass : klass) {
             for (Activity activity : mActivityStack) {
                 if (activity != null && activity.getClass().equals(aClass)) {
@@ -120,23 +120,25 @@ public class ActivityManager {
 
     /**
      * 关闭所有的页面并打开一个新页面
+     *
      * @param aclass
      */
-    public void popAllToActivity(Class<? extends Activity> aclass){
-        while (!mActivityStack.empty()){
-            Activity activity = mActivityStack.pop();
-            if (activity != null) {
-                if(mActivityStack.size() == 1){
-                    activity.startActivity(new Intent(activity,aclass));
+    public void popAllToActivity(Class<? extends Activity> aclass) {
+        int size = mActivityStack.size();
+        for (int i = 0; i < size; i++) {
+            Activity pop = mActivityStack.pop();
+            if (pop != null) {
+                if (size - 1 == i) {
+                    pop.startActivity(new Intent(pop, aclass));
                 }
-                activity.finish();
+                pop.finish();
             }
         }
     }
 
     //移除所有的Activity
-    public void removeAll(){
-        while (!mActivityStack.empty()){
+    public void removeAll() {
+        while (!mActivityStack.empty()) {
             Activity activity = mActivityStack.pop();
             if (activity != null) {
                 activity.finish();
@@ -145,8 +147,7 @@ public class ActivityManager {
     }
 
 
-
-    public void exit(){
+    public void exit() {
         removeAll();
         System.exit(0);
     }
