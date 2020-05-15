@@ -110,6 +110,41 @@ public class Gain {
 
 
     /**
+     * 默认执行
+     *
+     * @param observable
+     * @param callback
+     */
+    public static <T> void exes(Observable<T> observable, Callback<T> callback) {
+        Class key = getCallClass();
+        LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
+        if (lifecycleProvider != null) {
+            exes(lifecycleProvider, observable, callback);
+        } else {
+            observable.compose(Gain.get().defaultSchedulers())
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        }
+    }
+
+
+    /**
+     * 默认执行
+     *
+     * @param observable
+     * @param callback
+     */
+    public static <T> void exes(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback) {
+        if (lifecycleProvider != null) {
+            observable.compose(Gain.get().defaultSchedulers(lifecycleProvider))
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        } else {
+            observable.compose(Gain.get().defaultSchedulers())
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        }
+    }
+
+
+    /**
      * 默认执行,带对话框
      * ActivityManager 里要设置当前的Activity
      * @param observable
@@ -144,6 +179,43 @@ public class Gain {
         }
     }
 
+
+    /**
+     * 默认执行,带对话框
+     * ActivityManager 里要设置当前的Activity
+     * @param observable
+     * @param callback
+     */
+    public static <T> void loads(Observable<T> observable, Callback<T> callback) {
+        Class key = getCallClass();
+        LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
+        Print.d(lifecycleProvider);
+        if (lifecycleProvider != null) {
+            loads(lifecycleProvider, observable, callback);
+        } else {
+            observable.compose(Gain.get().defaultDialogSchedulers())
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        }
+    }
+
+
+    /**
+     * 默认执行,带对话框
+     * ActivityManager 里要设置当前的Activity
+     * @param observable
+     * @param callback
+     */
+    public static <T> void loads(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback) {
+        if (lifecycleProvider != null) {
+            observable.compose(Gain.get().defaultDialogSchedulers(lifecycleProvider))
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        } else {
+            observable.compose(Gain.get().defaultDialogSchedulers())
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        }
+    }
+
+
     /**
      * 默认描述者
      *
@@ -152,6 +224,16 @@ public class Gain {
      */
     public <T> DefaultSubscriber<T> getDefaultSubscriber(Callback<T> callback) {
         return DefaultSubscriber.newInstance(callback);
+    }
+
+    /**
+     * 返回简单描述者
+     * @param callback
+     * @param <T>
+     * @return
+     */
+    public <T> SimpleSubscriber<T> getSimpleSubscriber(Callback<T> callback){
+        return SimpleSubscriber.newInstance(callback);
     }
 
     public static class Option<Api> {

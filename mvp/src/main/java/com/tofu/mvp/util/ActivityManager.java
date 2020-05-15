@@ -1,6 +1,7 @@
 package com.tofu.mvp.util;
 
 import android.app.Activity;
+import android.content.Intent;
 
 import com.tofu.mvp.base.BaseActivity;
 
@@ -117,6 +118,22 @@ public class ActivityManager {
         }
     }
 
+    /**
+     * 关闭所有的页面并打开一个新页面
+     * @param aclass
+     */
+    public void popAllToActivity(Class<? extends Activity> aclass){
+        while (!mActivityStack.empty()){
+            Activity activity = mActivityStack.pop();
+            if (activity != null) {
+                if(mActivityStack.size() == 1){
+                    activity.startActivity(new Intent(activity,aclass));
+                }
+                activity.finish();
+            }
+        }
+    }
+
     //移除所有的Activity
     public void removeAll(){
         while (!mActivityStack.empty()){
@@ -126,6 +143,7 @@ public class ActivityManager {
             }
         }
     }
+
 
 
     public void exit(){
