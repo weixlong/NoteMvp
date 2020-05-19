@@ -60,7 +60,7 @@ public class SmartView<T> extends SmartRefreshLayout {
 
     private boolean isLastPage  = false;
 
-    private boolean isNeedUserId = true;
+    private boolean isDefaultConver = true;
 
     public SmartView(Context context) {
         this(context,null);
@@ -151,6 +151,16 @@ public class SmartView<T> extends SmartRefreshLayout {
 
 
     /**
+     * 是否是默认转换
+     * @param isDefaultConver
+     * @return
+     */
+    public SmartView<T> isDefaultConver(boolean isDefaultConver) {
+        this.isDefaultConver = isDefaultConver;
+        return this;
+    }
+
+    /**
      * 获取当前页
      *
      * @return
@@ -160,15 +170,7 @@ public class SmartView<T> extends SmartRefreshLayout {
     }
 
 
-    /**
-     * 是否需要携带userId
-     * @param needUserId
-     * @return
-     */
-    public SmartView<T> setNeedUserId(boolean needUserId) {
-        isNeedUserId = needUserId;
-        return this;
-    }
+
 
     /**
      * post请求
@@ -364,31 +366,40 @@ public class SmartView<T> extends SmartRefreshLayout {
      * @param s
      */
     private void onSuccessCallback(String s) {
-//        if(clazz == null) {
-//            clazz = findProClass();
-//        }
         if (!TextUtils.isEmpty(s)) {
             if (callback != null) {
-                SmartResult result = JSONObject.parseObject(s, SmartResult.class);
-                if (result != null) {
-                    if (TextUtils.equals(Gain.Option.getSuccessCode()+"",result.getCode())) {
-                        if (clazz == null || clazz == String.class) {
-                            isLastPage = callback.onSuccess((T) result.getData(), isRefresh);
-                        } else {
-                            T t = JSONObject.parseObject(result.getData(), clazz);
-                            if(t != null) {
-                                isLastPage = callback.onSuccess(t, isRefresh);
+                if (isDefaultConver) {
+                    SmartResult result = JSONObject.parseObject(s, SmartResult.class);
+                    if (result != null) {
+                        if (TextUtils.equals(Gain.Option.getSuccessCode() + "", result.getCode())) {
+                            if (clazz == null || clazz == String.class) {
+                                isLastPage = callback.onSuccess((T) result.getData(), isRefresh);
                             } else {
-                                Log.e("smart"," json parse object error is null format json : \n" + result.getData());
-                                UnKnowException e = new UnKnowException(TextUtils.isEmpty(result.getMessage())?"未知异常":result.getMessage(), TextUtils.isEmpty(result.getCode())?-100:Integer.parseInt(result.getCode()));
-                                onErrorCallback(e);
+                                T t = JSONObject.parseObject(result.getData(), clazz);
+                                if (t != null) {
+                                    isLastPage = callback.onSuccess(t, isRefresh);
+                                } else {
+                                    Log.e("smart", " json parse object error is null format json : \n" + result.getData());
+                                    UnKnowException e = new UnKnowException(TextUtils.isEmpty(result.getMessage()) ? "未知异常" : result.getMessage(), TextUtils.isEmpty(result.getCode()) ? -100 : Integer.parseInt(result.getCode()));
+                                    onErrorCallback(e);
+                                }
                             }
+                            notifySmartViewLoadMoreFinishChanged(isLastPage);
+                        } else {
+                            UnKnowException e = new UnKnowException(TextUtils.isEmpty(result.getMessage()) ? "未知异常" : result.getMessage(), TextUtils.isEmpty(result.getCode()) ? -100 : Integer.parseInt(result.getCode()));
+                            onErrorCallback(e);
                         }
-                        notifySmartViewLoadMoreFinishChanged(isLastPage);
+                    }
+                } else {
+                    T t = JSONObject.parseObject(s, clazz);
+                    if (t != null) {
+                        isLastPage = callback.onSuccess(t, isRefresh);
                     } else {
-                        UnKnowException e = new UnKnowException(TextUtils.isEmpty(result.getMessage())?"未知异常":result.getMessage(), TextUtils.isEmpty(result.getCode())?-100:Integer.parseInt(result.getCode()));
+                        Log.e("smart", " json parse object error is null format json : \n" + s);
+                        UnKnowException e = new UnKnowException("转换异常，请检查类型与数据格式",-101);
                         onErrorCallback(e);
                     }
+                    notifySmartViewLoadMoreFinishChanged(isLastPage);
                 }
             }
         }
