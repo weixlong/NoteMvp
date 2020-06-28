@@ -40,10 +40,7 @@ public class MvpNote {
     }
 
 
-
-
-
-    /**
+      /**
      * 解绑生命周期，使用默认时vClass为V层实现的class
      * @param vClass
      * @param <V>

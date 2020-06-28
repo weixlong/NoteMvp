@@ -14,5 +14,6 @@ public interface Main1Contract  {
 
     interface Model{
         void getValue1(Callback<String> callback);
+        void getValue2(Callback<String> callback);
     }
 }

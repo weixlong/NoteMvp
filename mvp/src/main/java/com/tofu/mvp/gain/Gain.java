@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.lxj.xpopup.XPopup;
 import com.lxj.xpopup.impl.LoadingPopupView;
+import com.tofu.mvp.MvpNote;
 import com.tofu.mvp.gain.convert.FastJsonConverterFactory;
 import com.tofu.mvp.gain.convert.ToStringConverterFactory;
 import com.tofu.mvp.gain.exception.ExceptionHandler;
@@ -20,6 +21,7 @@ import com.trello.rxlifecycle2.android.FragmentEvent;
 import com.trello.rxlifecycle2.components.support.RxFragment;
 import com.trello.rxlifecycle2.components.support.RxFragmentActivity;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -49,6 +51,7 @@ public class Gain {
     private static class Instance {
         private static Option option = new Option();
         private static Gain request = new Gain();
+        private static HashMap<Class,Object> api = new HashMap<>();
     }
 
 
@@ -57,22 +60,31 @@ public class Gain {
      *
      * @return Api
      */
-    public static <Api> Api api() {
-        return (Api) Instance.option.api;
+    public static <Api> Api api(Class<Api> apiClass) {
+        return (Api) Instance.api.get(apiClass);
     }
 
 
     /**
      * 加载Gain生命周期跟随,
      * 当key为受管理的V层时，会跟随unbind一起释放，
-     * 如key不受管理时，请手动释放MvpNote.unBindLifecycle.
-     * @param key 当前实现生命周期的实体class
+     * 如key不受管理时，请手动释放Gain.unAttachLifecycle.
+     *
+     * @param key    当前实现生命周期的实体class
      * @param attach 依赖的其他MVP里使用Gain的地方跟随key指向的生命周期
      */
-    public static <V> void loadAttachLifecycle(Class<V> key,Class... attach){
-        Mvp.addLifeAttach(key,attach);
+    public static <V> void loadAttachLifecycle(Class<V> key, Class... attach) {
+        Mvp.addLifeAttach(key, attach);
     }
 
+    /**
+     * 解绑生命周期跟随
+     * @param key
+     * @param <V>
+     */
+    public static <V> void unAttachLifecycle(Class<V> key) {
+        MvpNote.unBindAttach(key);
+    }
 
     /**
      * 默认执行
@@ -147,6 +159,7 @@ public class Gain {
     /**
      * 默认执行,带对话框
      * ActivityManager 里要设置当前的Activity
+     *
      * @param observable
      * @param callback
      */
@@ -166,6 +179,7 @@ public class Gain {
     /**
      * 默认执行,带对话框
      * ActivityManager 里要设置当前的Activity
+     *
      * @param observable
      * @param callback
      */
@@ -183,6 +197,7 @@ public class Gain {
     /**
      * 默认执行,带对话框
      * ActivityManager 里要设置当前的Activity
+     *
      * @param observable
      * @param callback
      */
@@ -202,6 +217,7 @@ public class Gain {
     /**
      * 默认执行,带对话框
      * ActivityManager 里要设置当前的Activity
+     *
      * @param observable
      * @param callback
      */
@@ -228,25 +244,24 @@ public class Gain {
 
     /**
      * 返回简单描述者
+     *
      * @param callback
      * @param <T>
      * @return
      */
-    public <T> SimpleSubscriber<T> getSimpleSubscriber(Callback<T> callback){
+    public <T> SimpleSubscriber<T> getSimpleSubscriber(Callback<T> callback) {
         return SimpleSubscriber.newInstance(callback);
     }
 
     public static class Option<Api> {
 
-        private static int HTTP_CONNECT_OUT_TIME = 10 * 1000;
+        private static int HTTP_CONNECT_OUT_TIME = 10;
 
         private static String BASE_URL = "";
 
         private static int SUCCESS_CODE = 0;
 
         private OkHttpClient.Builder builder;
-
-        private Api api;
 
         private Class<Api> apiClass;
 
@@ -317,8 +332,9 @@ public class Gain {
 
         /**
          * 设置接口类
-         *  可在MVP层中GainApi注解使用该api
-         *  也可Gain.api() 调用
+         * 可在MVP层中GainApi注解使用该api
+         * 也可Gain.api() 调用
+         *
          * @param apiClass
          * @return Option
          */
@@ -352,7 +368,7 @@ public class Gain {
          * 构建Retrofit
          */
         public void build() {
-            api = createApi(apiClass, BASE_URL);
+            Instance.api.put(apiClass,createApi(apiClass, BASE_URL));
             ExceptionHandler.exceptionCallback(exceptionCallback);
         }
 
@@ -395,11 +411,11 @@ public class Gain {
         /**
          * 超时时间
          *
-         * @param outTime
+         * @param outSecondTime
          * @return
          */
-        public Option setConnectOutTime(int outTime) {
-            Option.HTTP_CONNECT_OUT_TIME = outTime;
+        public Option setConnectOutTime(int outSecondTime) {
+            Option.HTTP_CONNECT_OUT_TIME = outSecondTime;
             return this;
         }
 

@@ -28,6 +28,17 @@ public class Main1Presenter implements Main1Contract.Presenter {
             @Override
             public void onFailed(String error) {
                 print1(error);
+                model.getValue2(new Callback<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        print1(s);
+                    }
+
+                    @Override
+                    public void onFailed(String error) {
+                        print1("with api1 "+error);
+                    }
+                });
             }
         });
     }

@@ -331,7 +331,7 @@ public class Mvp {
      * @param life
      */
     public static void addLife(Class key, Class[] with, LifecycleProvider life) {
-        if(!lps.containsKey(lps)) {
+        if(!lps.containsKey(key)) {
             LFP lfp = new LFP(key, with, life);
             lps.put(key, lfp);
         }
@@ -369,10 +369,11 @@ public class Mvp {
      */
     private static void setApi(Object o, Field field) {
         try {
-            Object api = Gain.api();
+            Object api = Gain.api(field.getType());
             if (api == null) {
                 Print.e("Gain api is null, please init Gain and set api class.");
             } else {
+                Print.d("user api "+field.getType());
                 field.setAccessible(true);
                 field.set(o, api);
                 field.setAccessible(false);

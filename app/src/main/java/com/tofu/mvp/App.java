@@ -14,11 +14,15 @@ public class App extends Application {
         Gain.option().api(ApiService.class)
                 .baseUrl("http://192.168.1.8:8084/user/")
                 .okCode(0)
-                .setConnectOutTime(20000)
+                .setConnectOutTime(5)
+                .build();
+
+        Gain.option().api(ApiService1.class)
+                .baseUrl("http://www.julezhibo.com/yunbao/user/")
+                .okCode(0)
+                .setConnectOutTime(5)
                 .build();
     }
 
-//    public static ApiService api(){
-//        return Gain.api();
-//    }
+
 }
