@@ -19,7 +19,7 @@ public class Tu {
     private static Context context;
 
     public static void initialize(Context context) {
-        Tu.context = context;
+        Tu.context = context.getApplicationContext();
     }
 
 
@@ -82,7 +82,6 @@ public class Tu {
      */
     public void snack(String msg,boolean isShot){
         EventBus.getDefault().post(new SnackEvent(!isShot,msg));
-
     }
 
 //    /**

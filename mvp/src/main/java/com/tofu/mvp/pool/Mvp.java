@@ -43,6 +43,11 @@ public class Mvp {
     private static HashMap<Class,Class[]> attach = new HashMap<>();
 
     /**
+     * 生命周期接管
+     */
+    private static HashMap<Class,Class> takeoverKeys = new HashMap<>();
+
+    /**
      * @param v 绑定一个实体View 实现 ，如：Activity,Fragment等。
      *          在View上使用注解@Presenter和@Model指定对应的接口和实现。
      */
@@ -266,6 +271,25 @@ public class Mvp {
     }
 
 
+    public static void addTakeOverLifeKeyToNewKey(Class k,Class k1){
+        takeoverKeys.put(k, k1);
+    }
+
+
+    public static void removeTakeOverLifeKey(Class k){
+        if(takeoverKeys.containsValue(k)){
+            Iterator<Map.Entry<Class, Class>> iterator = takeoverKeys.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Class, Class> next = iterator.next();
+                if(next.getValue() == k){
+                    takeoverKeys.remove(next.getKey());
+                    return;
+                }
+            }
+        }
+    }
+
+
     private static Class[] concat(Class[] first, Class[] second) {
         Class[] result = Arrays.copyOf(first, first.length + second.length);
         System.arraycopy(second, 0, result, first.length, second.length);
@@ -298,6 +322,14 @@ public class Mvp {
      * @return
      */
     public static LifecycleProvider getLife(Class key) {
+        if(takeoverKeys.containsKey(key)){
+            Class newKey = takeoverKeys.get(key);
+            if(newKey != null){
+                if (lps.containsKey(newKey)) {
+                    return lps.get(newKey).life;
+                }
+            }
+        }
         if (lps.containsKey(key)) {
             return lps.get(key).life;
         }

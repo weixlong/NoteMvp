@@ -1,6 +1,7 @@
 package com.tofu.mvp.smart;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -15,12 +16,18 @@ import com.lzy.okgo.model.HttpParams;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshLoadMoreListener;
+import com.tofu.mvp.R;
 import com.tofu.mvp.gain.Gain;
 import com.tofu.mvp.gain.exception.ExceptionHandler;
 import com.tofu.mvp.gain.exception.UnKnowException;
 import com.tofu.mvp.gain.trust.SSLSocketClient;
+import com.tofu.mvp.util.CollectionUtils;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -31,7 +38,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * Created by wxl on 2019/7/9.
- *
  */
 
 public class SmartView<T> extends SmartRefreshLayout {
@@ -46,7 +52,7 @@ public class SmartView<T> extends SmartRefreshLayout {
 
     private String url;
 
-    private HashMap<String,String> params = new HashMap<>();
+    private HashMap<String, String> params = new HashMap<>();
 
     private HttpHeaders headers = new HttpHeaders();
 
@@ -58,23 +64,36 @@ public class SmartView<T> extends SmartRefreshLayout {
 
     private boolean isRefresh = true;
 
-    private boolean isLastPage  = false;
+    private boolean isLastPage = false;
 
     private boolean isDefaultConver = true;
 
+    private String beanName;
+
     public SmartView(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public SmartView(Context context, AttributeSet attrs) {
-        this(context, attrs,-1);
+        this(context, attrs, -1);
+        paresAttr(context, attrs);
     }
 
     public SmartView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        paresAttr(context, attrs);
     }
 
-
+    private void paresAttr(Context context,AttributeSet attrs){
+        if(attrs != null){
+            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SmartView);
+            beanName = typedArray.getString(R.styleable.SmartView_bean);
+            pageKey = typedArray.getString(R.styleable.SmartView_pageKey);
+            url = typedArray.getString(R.styleable.SmartView_url);
+            start_page_index = typedArray.getIndex(R.styleable.SmartView_start_page);
+            page = start_page_index;
+        }
+    }
 
     /**
      * 设置参数
@@ -84,8 +103,11 @@ public class SmartView<T> extends SmartRefreshLayout {
      * @param
      * @return
      */
-    public SmartView<T> put(String key, String value) {
-        params.put(key, value);
+    public SmartView<T> put(String key, Object value) {
+        if(value == null){
+            value = "null";
+        }
+        params.put(key, value.toString());
         return this;
     }
 
@@ -98,13 +120,36 @@ public class SmartView<T> extends SmartRefreshLayout {
      * @param
      * @return
      */
-    public SmartView<T> add(String key, String value, boolean isAdd) {
-        if(isAdd) {
-            params.put(key, value);
+    public SmartView<T> add(String key, Object value, boolean isAdd) {
+        if(value == null){
+            value = "null";
+        }
+        if (isAdd) {
+            params.put(key, value.toString());
         } else {
             boolean b = params.containsKey(key);
-            if(b){
+            if (b) {
                 params.remove(key);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 设置参数
+     * @param param
+     * @return
+     */
+    public SmartView<T> put(Map<String , Object> param){
+        if(CollectionUtils.isNotEmpty(param)){
+            Iterator<Map.Entry<String, Object>> iterator = param.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, Object> next = iterator.next();
+                Object value = next.getValue();
+                if(value == null){
+                    value = "null";
+                }
+                params.put(next.getKey(),value.toString());
             }
         }
         return this;
@@ -152,6 +197,7 @@ public class SmartView<T> extends SmartRefreshLayout {
 
     /**
      * 是否是默认转换
+     *
      * @param isDefaultConver
      * @return
      */
@@ -168,8 +214,6 @@ public class SmartView<T> extends SmartRefreshLayout {
     public int getCurrentPageNo() {
         return page;
     }
-
-
 
 
     /**
@@ -243,7 +287,7 @@ public class SmartView<T> extends SmartRefreshLayout {
             } else {
                 ++page;
             }
-            params.put(pageKey, page+"");
+            params.put(pageKey, page + "");
         }
         if (isPost) {
             onPostRequest();
@@ -337,6 +381,7 @@ public class SmartView<T> extends SmartRefreshLayout {
     private void onErrorCallback(Exception e) {
         onErrorSmartPageNoChanged();
         if (callback != null) {
+            callback.isDrop = isRefresh;
             callback.onFailed(e.getMessage(), isRefresh);
         }
         ExceptionHandler.OnExceptionCallback exceptionCallback = Gain.option().getExceptionCallback();
@@ -355,7 +400,7 @@ public class SmartView<T> extends SmartRefreshLayout {
                     --page;
                 }
             }
-            params.put(pageKey, page+"");
+            params.put(pageKey, page + "");
         }
     }
 
@@ -372,6 +417,7 @@ public class SmartView<T> extends SmartRefreshLayout {
                     SmartResult result = JSONObject.parseObject(s, SmartResult.class);
                     if (result != null) {
                         if (TextUtils.equals(Gain.Option.getSuccessCode() + "", result.getCode())) {
+                            if(clazz == null) clazz = findProClass();
                             if (clazz == null || clazz == String.class) {
                                 isLastPage = callback.onSuccess((T) result.getData(), isRefresh);
                             } else {
@@ -393,10 +439,11 @@ public class SmartView<T> extends SmartRefreshLayout {
                 } else {
                     T t = JSONObject.parseObject(s, clazz);
                     if (t != null) {
+                        callback.isDrop = isRefresh;
                         isLastPage = callback.onSuccess(t, isRefresh);
                     } else {
                         Log.e("smart", " json parse object error is null format json : \n" + s);
-                        UnKnowException e = new UnKnowException("转换异常，请检查类型与数据格式",-101);
+                        UnKnowException e = new UnKnowException("转换异常，请检查类型与数据格式", -101);
                         onErrorCallback(e);
                     }
                     notifySmartViewLoadMoreFinishChanged(isLastPage);
@@ -418,16 +465,22 @@ public class SmartView<T> extends SmartRefreshLayout {
         }
     }
 
-//    /**
-//     * 找到pro
-//     *
-//     * @return
-//     */
-//    private Class<T> findProClass() {
-//        Type genType = getClass().getGenericSuperclass();
-//        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
-//        return (Class<T>) params[0];
-//    }
+    /**
+     * 找到pro
+     *
+     * @return
+     */
+    private Class<T> findProClass() {
+        if(TextUtils.isEmpty(beanName)){
+            return null;
+        }
+        try {
+            return (Class<T>) Class.forName(beanName);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
     /**
@@ -442,7 +495,7 @@ public class SmartView<T> extends SmartRefreshLayout {
     }
 
 
-    public SmartView<T> clazz(Class<T> clazz){
+    public SmartView<T> clazz(Class<T> clazz) {
         this.clazz = clazz;
         return this;
     }

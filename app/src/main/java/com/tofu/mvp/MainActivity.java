@@ -14,11 +14,13 @@ import com.tofu.mvp.mvp.MainModel;
 import com.tofu.mvp.mvp.MainPresenter;
 import com.tofu.mvp.note.PMTarget;
 import com.tofu.mvp.note.Presenter;
+import com.tofu.mvp.permissions.OnPermissionResultCallback;
+import com.tofu.mvp.permissions.PermissionReq;
 import com.trello.rxlifecycle2.components.RxDialogFragment;
 
 
 @PMTarget(p = {MainPresenter.class, Main1Presenter.class},m = {MainModel.class, Main1Model.class})
-public class MainActivity extends BaseActivity implements MainContract.View {
+public class MainActivity extends BaseActivity implements MainContract.View, OnPermissionResultCallback {
 
     @Presenter
     MainContract.Presenter presenter;
@@ -34,6 +36,11 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     @Override
     protected void onCreateBindViewChanged(@Nullable Bundle savedInstanceState) {
         MvpNote.bind(this);
+        PermissionReq.instance(this)
+                .permissions()
+                .requestCode(123)
+                .callback(this)
+                .req();
     }
 
     @Override
@@ -50,5 +57,15 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     public void onPrintClick(View view) {
         this.view = (TextView) view;
         presenter.print();
+    }
+
+    @Override
+    public void onRequestPermissionSuccess(int requestCode) {
+
+    }
+
+    @Override
+    public void onRequestPermissionFailed(int requestCode) {
+
     }
 }

@@ -4,4 +4,5 @@
     <item name="activity_title_id" type="id"/>
     <item name="activity_menu_id" type="id"/>
     <item name="xbanner_pointId" type="id" />
+    <item name="anim_view_id" type="id"/>
 </resources>

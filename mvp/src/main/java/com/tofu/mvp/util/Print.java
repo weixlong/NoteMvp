@@ -6,7 +6,7 @@ public class Print {
 
     private static String TAG = Print.class.getSimpleName();
 
-    private static boolean debug = true;
+    public static boolean debug = true;
 
     private static int LENGTH = 2000;
 

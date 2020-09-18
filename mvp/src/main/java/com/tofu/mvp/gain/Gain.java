@@ -86,20 +86,44 @@ public class Gain {
         MvpNote.unBindAttach(key);
     }
 
+
+    /**
+     * 生命周期的接管，替换@GainLifecycle 里注解的生命周期key值
+     * @param takeOverWho 被接管的key
+     * @param newKey 新的key
+     * @param <V>
+     * @param <K>
+     */
+    public static <V,K> void takeOverLifecycleToNewKey(Class<V> takeOverWho,Class<K> newKey){
+        Mvp.addTakeOverLifeKeyToNewKey(takeOverWho,newKey);
+    }
+
+
+    /**
+     * 取消生命周期接管，把接管的key 交还给@GainLifecycle 里的key
+     * @param key 目前接管的key
+     * @param <K>
+     */
+    public static <K> void cancelTakeOverLifecycle(Class<K> key){
+        Mvp.removeTakeOverLifeKey(key);
+    }
+
+
+
     /**
      * 默认执行
      *
      * @param observable
      * @param callback
      */
-    public static <T> void exe(Observable<HttpResult<T>> observable, Callback<T> callback) {
+    public static <T> void exe(Observable<T> observable, Callback<T> callback) {
         Class key = getCallClass();
         LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
         if (lifecycleProvider != null) {
             exe(lifecycleProvider, observable, callback);
         } else {
             observable.compose(Gain.get().defaultSchedulers())
-                    .subscribe(Gain.get().getDefaultSubscriber(callback));
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
         }
     }
 
@@ -110,28 +134,11 @@ public class Gain {
      * @param observable
      * @param callback
      */
-    public static <T> void exe(LifecycleProvider lifecycleProvider, Observable<HttpResult<T>> observable, Callback<T> callback) {
-        if (lifecycleProvider != null) {
-            observable.compose(Gain.get().defaultSchedulers(lifecycleProvider))
-                    .subscribe(Gain.get().getDefaultSubscriber(callback));
-        } else {
-            observable.compose(Gain.get().defaultSchedulers())
-                    .subscribe(Gain.get().getDefaultSubscriber(callback));
-        }
-    }
-
-
-    /**
-     * 默认执行
-     *
-     * @param observable
-     * @param callback
-     */
-    public static <T> void exes(Observable<T> observable, Callback<T> callback) {
+    public static <T> void exe(Observable<T> observable, Callback<T> callback,ActivityEvent event) {
         Class key = getCallClass();
         LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
         if (lifecycleProvider != null) {
-            exes(lifecycleProvider, observable, callback);
+            exe(lifecycleProvider, observable, callback,event);
         } else {
             observable.compose(Gain.get().defaultSchedulers())
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
@@ -145,7 +152,7 @@ public class Gain {
      * @param observable
      * @param callback
      */
-    public static <T> void exes(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback) {
+    public static <T> void exe(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback) {
         if (lifecycleProvider != null) {
             observable.compose(Gain.get().defaultSchedulers(lifecycleProvider))
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
@@ -154,6 +161,24 @@ public class Gain {
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
         }
     }
+
+
+    /**
+     * 默认执行
+     *
+     * @param observable
+     * @param callback
+     */
+    public static <T> void exe(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback,ActivityEvent event) {
+        if (lifecycleProvider != null) {
+            observable.compose(Gain.get().defaultSchedulers(lifecycleProvider,event))
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        } else {
+            observable.compose(Gain.get().defaultSchedulers())
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        }
+    }
+
 
 
     /**
@@ -163,7 +188,7 @@ public class Gain {
      * @param observable
      * @param callback
      */
-    public static <T> void load(Observable<HttpResult<T>> observable, Callback<T> callback) {
+    public static <T> void load(Observable<T> observable, Callback<T> callback) {
         Class key = getCallClass();
         LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
         Print.d(lifecycleProvider);
@@ -171,7 +196,7 @@ public class Gain {
             load(lifecycleProvider, observable, callback);
         } else {
             observable.compose(Gain.get().defaultDialogSchedulers())
-                    .subscribe(Gain.get().getDefaultSubscriber(callback));
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
         }
     }
 
@@ -183,30 +208,12 @@ public class Gain {
      * @param observable
      * @param callback
      */
-    public static <T> void load(LifecycleProvider lifecycleProvider, Observable<HttpResult<T>> observable, Callback<T> callback) {
-        if (lifecycleProvider != null) {
-            observable.compose(Gain.get().defaultDialogSchedulers(lifecycleProvider))
-                    .subscribe(Gain.get().getDefaultSubscriber(callback));
-        } else {
-            observable.compose(Gain.get().defaultDialogSchedulers())
-                    .subscribe(Gain.get().getDefaultSubscriber(callback));
-        }
-    }
-
-
-    /**
-     * 默认执行,带对话框
-     * ActivityManager 里要设置当前的Activity
-     *
-     * @param observable
-     * @param callback
-     */
-    public static <T> void loads(Observable<T> observable, Callback<T> callback) {
+    public static <T> void load(Observable<T> observable, Callback<T> callback,ActivityEvent event) {
         Class key = getCallClass();
         LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
         Print.d(lifecycleProvider);
         if (lifecycleProvider != null) {
-            loads(lifecycleProvider, observable, callback);
+            load(lifecycleProvider, observable, callback,event);
         } else {
             observable.compose(Gain.get().defaultDialogSchedulers())
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
@@ -221,9 +228,27 @@ public class Gain {
      * @param observable
      * @param callback
      */
-    public static <T> void loads(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback) {
+    public static <T> void load(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback) {
         if (lifecycleProvider != null) {
             observable.compose(Gain.get().defaultDialogSchedulers(lifecycleProvider))
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        } else {
+            observable.compose(Gain.get().defaultDialogSchedulers())
+                    .subscribe(Gain.get().getSimpleSubscriber(callback));
+        }
+    }
+
+
+    /**
+     * 默认执行,带对话框
+     * ActivityManager 里要设置当前的Activity
+     *
+     * @param observable
+     * @param callback
+     */
+    public static <T> void load(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback,ActivityEvent event) {
+        if (lifecycleProvider != null) {
+            observable.compose(Gain.get().defaultDialogSchedulers(lifecycleProvider,event))
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
         } else {
             observable.compose(Gain.get().defaultDialogSchedulers())
@@ -501,6 +526,27 @@ public class Gain {
      * @param lifecycleProvider
      * @return ObservableTransformer
      */
+    public <T> ObservableTransformer<T, T> defaultSchedulers(@NonNull LifecycleProvider lifecycleProvider,ActivityEvent event) {
+        if (lifecycleProvider instanceof RxFragmentActivity) {
+            return observable -> observable
+                    .subscribeOn(Schedulers.newThread())
+                    .compose(lifecycleProvider.bindUntilEvent(event))
+                    .observeOn(AndroidSchedulers.mainThread());
+        } else if (lifecycleProvider instanceof RxFragment) {
+            return observable -> observable
+                    .subscribeOn(Schedulers.newThread())
+                    .compose(lifecycleProvider.bindUntilEvent(event))
+                    .observeOn(AndroidSchedulers.mainThread());
+        }
+        return defaultSchedulers();
+    }
+
+    /**
+     * 获得默认Observable
+     *
+     * @param lifecycleProvider
+     * @return ObservableTransformer
+     */
     public <T> ObservableTransformer<T, T> defaultSchedulers(@NonNull LifecycleProvider lifecycleProvider) {
         if (lifecycleProvider instanceof RxFragmentActivity) {
             return observable -> observable
@@ -531,6 +577,38 @@ public class Gain {
                 .doFinally((Action) () -> {
                     option().dismissLoading();
                 });
+    }
+
+
+    /**
+     * 获得默认Dialog Observable
+     *
+     * @param lifecycleProvider
+     * @return ObservableTransformer
+     */
+    public <T> ObservableTransformer<T, T> defaultDialogSchedulers(@NonNull final LifecycleProvider lifecycleProvider,ActivityEvent event) {
+        if (lifecycleProvider instanceof RxFragmentActivity) {
+            return observable -> observable
+                    .subscribeOn(Schedulers.newThread())
+                    .compose(lifecycleProvider.bindUntilEvent(event))
+                    .doOnSubscribe((Consumer) disposable -> option().showLoading())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doFinally((Action) () -> {
+                        option().dismissLoading();
+                    });
+        } else if (lifecycleProvider instanceof RxFragment) {
+            return observable -> observable
+                    .subscribeOn(Schedulers.newThread())
+                    .compose(lifecycleProvider.bindUntilEvent(event))
+                    .doOnSubscribe(disposable -> {
+                        option().showLoading();
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doFinally((Action) () -> {
+                        option().dismissLoading();
+                    });
+        }
+        return defaultDialogSchedulers();
     }
 
 
