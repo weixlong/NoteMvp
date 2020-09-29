@@ -227,6 +227,7 @@ public class Anim {
                 animation.setRepeatCount(repeatCount);
                 animation.setRepeatMode(repeatMode);
                 animation.setFillAfter(fillAfter);
+                animation.setStartOffset(startOffset);
                 if (i != null) {
                     animation.setInterpolator(i);
                 }
