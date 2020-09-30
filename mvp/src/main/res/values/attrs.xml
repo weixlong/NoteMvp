@@ -72,4 +72,20 @@
         <attr name="start_page" format="integer"/>
     </declare-styleable>
 
+    <declare-styleable name="RadianStar">
+        <attr name="radian" format="float"/>
+        <attr name="star" format="reference"/>
+        <attr name="empty_star" format="reference"/>
+        <attr name="h_margin" format="dimension|reference"/>
+        <attr name="star_count" format="integer"/>
+        <attr name="count" format="integer"/>
+        <attr name="starSize" format="dimension"/>
+        <attr name="auto_height" format="boolean"/>
+        <attr name="enable_anim" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="ImageOverlyingView">
+        <attr name="imageSize" format="dimension|reference"/>
+        <attr name="padding" format="dimension|reference"/>
+    </declare-styleable>
 </resources>

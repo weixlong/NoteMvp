@@ -23,8 +23,6 @@ import com.tofu.mvp.gain.exception.UnKnowException;
 import com.tofu.mvp.gain.trust.SSLSocketClient;
 import com.tofu.mvp.util.CollectionUtils;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -303,9 +301,9 @@ public class SmartView<T> extends SmartRefreshLayout {
     private void onPostRequest() {
         OkGo.post(url)
                 .tag(url)
-                .writeTimeOut(Gain.Option.getHttpConnectOutTime())
-                .readTimeOut(Gain.Option.getHttpConnectOutTime())
-                .connTimeOut(Gain.Option.getHttpConnectOutTime())
+                .writeTimeOut(Gain.Option.getHttpConnectOutTime()*1000)
+                .readTimeOut(Gain.Option.getHttpConnectOutTime()*1000)
+                .connTimeOut(Gain.Option.getHttpConnectOutTime()*1000)
                 .upJson(JSONObject.toJSONString(params))
                 .setHostnameVerifier(SSLSocketClient.getHostnameVerifier())
                 //.addInterceptor(new AccessTokenInterceptor())
@@ -343,9 +341,9 @@ public class SmartView<T> extends SmartRefreshLayout {
         httpParams.put(params);
         OkGo.get(url)
                 .tag(url)
-                .writeTimeOut(Gain.Option.getHttpConnectOutTime())
-                .readTimeOut(Gain.Option.getHttpConnectOutTime())
-                .connTimeOut(Gain.Option.getHttpConnectOutTime())
+                .writeTimeOut(Gain.Option.getHttpConnectOutTime()*1000)
+                .readTimeOut(Gain.Option.getHttpConnectOutTime()*1000)
+                .connTimeOut(Gain.Option.getHttpConnectOutTime()*1000)
                 .setHostnameVerifier(SSLSocketClient.getHostnameVerifier())
                 //.addInterceptor(new AccessTokenInterceptor())
                 .headers(headers)
