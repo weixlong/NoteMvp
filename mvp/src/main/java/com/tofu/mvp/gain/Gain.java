@@ -417,6 +417,7 @@ public class Gain {
         private void dismissLoading() {
             if (popupView != null && popupView.isShow()) {
                 popupView.dismiss();
+                popupView = null;
             }
         }
 
