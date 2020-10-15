@@ -435,14 +435,19 @@ public class SmartView<T> extends SmartRefreshLayout {
                         }
                     }
                 } else {
-                    T t = JSONObject.parseObject(s, clazz);
-                    if (t != null) {
-                        callback.isDrop = isRefresh;
-                        isLastPage = callback.onSuccess(t, isRefresh);
+                    if(clazz == null) clazz = findProClass();
+                    if (clazz == null || clazz == String.class) {
+                        isLastPage = callback.onSuccess((T) s, isRefresh);
                     } else {
-                        Log.e("smart", " json parse object error is null format json : \n" + s);
-                        UnKnowException e = new UnKnowException("转换异常，请检查类型与数据格式", -101);
-                        onErrorCallback(e);
+                        T t = JSONObject.parseObject(s, clazz);
+                        if (t != null) {
+                            callback.isDrop = isRefresh;
+                            isLastPage = callback.onSuccess(t, isRefresh);
+                        } else {
+                            Log.e("smart", " json parse object error is null format json : \n" + s);
+                            UnKnowException e = new UnKnowException("转换异常，请检查类型与数据格式", -101);
+                            onErrorCallback(e);
+                        }
                     }
                     notifySmartViewLoadMoreFinishChanged(isLastPage);
                 }

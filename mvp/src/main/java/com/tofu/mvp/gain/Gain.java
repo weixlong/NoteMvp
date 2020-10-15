@@ -44,7 +44,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Gain {
 
-
     /**
      * 静态内部类保证全局唯一
      */

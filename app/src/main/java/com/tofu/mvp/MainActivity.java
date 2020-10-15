@@ -16,7 +16,6 @@ import com.tofu.mvp.note.PMTarget;
 import com.tofu.mvp.note.Presenter;
 import com.tofu.mvp.permissions.OnPermissionResultCallback;
 import com.tofu.mvp.permissions.PermissionReq;
-import com.trello.rxlifecycle2.components.RxDialogFragment;
 
 
 @PMTarget(p = {MainPresenter.class, Main1Presenter.class},m = {MainModel.class, Main1Model.class})
@@ -30,7 +29,7 @@ public class MainActivity extends BaseActivity implements MainContract.View, OnP
 
     @Override
     protected int onCreateBindViewLayoutId(@Nullable Bundle savedInstanceState) {
-        return R.layout.activity_main;
+        return R.layout.activity_main_layout;
     }
 
     @Override

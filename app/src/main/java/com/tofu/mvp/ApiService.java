@@ -1,7 +1,5 @@
 package com.tofu.mvp;
 
-import com.tofu.mvp.gain.HttpResult;
-
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 
@@ -11,5 +9,5 @@ import retrofit2.http.GET;
 public interface ApiService {
 
     @GET("api/anchor/push-stream")
-    Observable<HttpResult<String>> getUser();
+    Observable<String> getUser();
 }
