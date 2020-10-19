@@ -293,6 +293,10 @@ public class Gain {
 
         private LoadingPopupView popupView;
 
+        private ActivityEvent event = ActivityEvent.DESTROY;
+
+        private FragmentEvent fragmentEvent = FragmentEvent.DESTROY;
+
         private Option() {
             if (builder == null) {
                 builder = new OkHttpClient.Builder()
@@ -342,6 +346,23 @@ public class Gain {
             return this;
         }
 
+        /**
+         * 设置取消请求的生命周期
+         */
+        public Option setClientCancelEvent(ActivityEvent event) {
+            this.event = event;
+            return this;
+        }
+
+        /**
+         * 设置取消请求的生命周期
+         * @param fragmentEvent
+         * @return
+         */
+        public Option setClientCancelEvent(FragmentEvent fragmentEvent) {
+            this.fragmentEvent = fragmentEvent;
+            return this;
+        }
 
         /**
          * 错误回调
@@ -551,12 +572,12 @@ public class Gain {
         if (lifecycleProvider instanceof RxFragmentActivity) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
-                    .compose(lifecycleProvider.bindUntilEvent(ActivityEvent.DESTROY))
+                    .compose(lifecycleProvider.bindUntilEvent(Instance.option.event))
                     .observeOn(AndroidSchedulers.mainThread());
         } else if (lifecycleProvider instanceof RxFragment) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
-                    .compose(lifecycleProvider.bindUntilEvent(FragmentEvent.DESTROY))
+                    .compose(lifecycleProvider.bindUntilEvent(Instance.option.fragmentEvent))
                     .observeOn(AndroidSchedulers.mainThread());
         }
         return defaultSchedulers();
@@ -622,7 +643,7 @@ public class Gain {
         if (lifecycleProvider instanceof RxFragmentActivity) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
-                    .compose(lifecycleProvider.bindUntilEvent(ActivityEvent.DESTROY))
+                    .compose(lifecycleProvider.bindUntilEvent(Instance.option.event))
                     .doOnSubscribe((Consumer) disposable -> option().showLoading())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doFinally((Action) () -> {
@@ -631,7 +652,7 @@ public class Gain {
         } else if (lifecycleProvider instanceof RxFragment) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
-                    .compose(lifecycleProvider.bindUntilEvent(FragmentEvent.DESTROY))
+                    .compose(lifecycleProvider.bindUntilEvent(Instance.option.fragmentEvent))
                     .doOnSubscribe(disposable -> {
                         option().showLoading();
                     })
