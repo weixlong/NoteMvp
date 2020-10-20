@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,13 +46,17 @@ public class XmlDB {
 
 
     public static XmlBuilder get(String name) {
-        prefs = app.getSharedPreferences(name, MODE_PRIVATE);
+        if(app != null) {
+            prefs = app.getSharedPreferences(name, MODE_PRIVATE);
+        }
         return BuilderConstructor.builder;
     }
 
 
     public static XmlBuilder get() {
-        prefs = app.getSharedPreferences(app.getPackageName(), MODE_PRIVATE);
+        if(app != null) {
+            prefs = app.getSharedPreferences(app.getPackageName(), MODE_PRIVATE);
+        }
         return BuilderConstructor.builder;
     }
 
@@ -73,7 +78,8 @@ public class XmlDB {
          * @param obj
          */
         public <T> XmlBuilder putObject(T obj) {
-            if (obj instanceof Serializable) {// obj必须实现Serializable接口，否则会出问题
+
+            if (prefs != null && obj instanceof Serializable) {// obj必须实现Serializable接口，否则会出问题
                 try {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -94,14 +100,16 @@ public class XmlDB {
         public <T> T getObject(Class<T> clazz) {
             T obj = null;
             try {
-                String base64 = prefs.getString(clazz.getName(), "");
-                if (base64.equals("")) {
-                    return null;
+                if(prefs != null) {
+                    String base64 = prefs.getString(clazz.getName(), "");
+                    if (base64.equals("")) {
+                        return null;
+                    }
+                    byte[] base64Bytes = Base64.decode(base64.getBytes(), 1);
+                    ByteArrayInputStream bais = new ByteArrayInputStream(base64Bytes);
+                    ObjectInputStream ois = new ObjectInputStream(bais);
+                    obj = (T) ois.readObject();
                 }
-                byte[] base64Bytes = Base64.decode(base64.getBytes(), 1);
-                ByteArrayInputStream bais = new ByteArrayInputStream(base64Bytes);
-                ObjectInputStream ois = new ObjectInputStream(bais);
-                obj = (T) ois.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -112,14 +120,16 @@ public class XmlDB {
         public <T> T getObject(String key) {
             T obj = null;
             try {
-                String base64 = prefs.getString(key, "");
-                if (base64.equals("")) {
-                    return null;
+                if(prefs != null) {
+                    String base64 = prefs.getString(key, "");
+                    if (base64.equals("")) {
+                        return null;
+                    }
+                    byte[] base64Bytes = Base64.decode(base64.getBytes(), 1);
+                    ByteArrayInputStream bais = new ByteArrayInputStream(base64Bytes);
+                    ObjectInputStream ois = new ObjectInputStream(bais);
+                    obj = (T) ois.readObject();
                 }
-                byte[] base64Bytes = Base64.decode(base64.getBytes(), 1);
-                ByteArrayInputStream bais = new ByteArrayInputStream(base64Bytes);
-                ObjectInputStream ois = new ObjectInputStream(bais);
-                obj = (T) ois.readObject();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -135,7 +145,7 @@ public class XmlDB {
          * @param obj
          */
         public <T> XmlBuilder putObject(String key,T obj) {
-            if (obj instanceof Serializable) {// obj必须实现Serializable接口，否则会出问题
+            if (prefs != null && obj instanceof Serializable) {// obj必须实现Serializable接口，否则会出问题
                 try {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -155,67 +165,86 @@ public class XmlDB {
 
 
         public XmlBuilder put(String key, String value) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(key, value).apply();
-            editor.commit();
+            if (prefs != null) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(key, value).apply();
+                editor.commit();
+            }
             return this;
         }
 
         public XmlBuilder put(String key, boolean value) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean(key, value).apply();
-            editor.commit();
+            if (prefs != null) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean(key, value).apply();
+                editor.commit();
+            }
             return this;
         }
 
         public XmlBuilder put(String key, int value) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt(key, value).apply();
-            editor.commit();
+            if (prefs != null) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(key, value).apply();
+                editor.commit();
+            }
             return this;
         }
 
 
         public XmlBuilder put(String key, long value) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putLong(key, value).apply();
-            editor.commit();
+            if (prefs != null) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putLong(key, value).apply();
+                editor.commit();
+            }
             return this;
         }
 
 
         public XmlBuilder put(String key, double value) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(key, Double.toString(value)).apply();
-            editor.commit();
+            if (prefs != null) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(key, Double.toString(value)).apply();
+                editor.commit();
+            }
             return this;
         }
 
 
         public XmlBuilder put(String key, float value) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putFloat(key, value).apply();
-            editor.commit();
+            if (prefs != null) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putFloat(key, value).apply();
+                editor.commit();
+            }
             return this;
         }
 
         public XmlBuilder put(String key, Set<String> defValues) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putStringSet(key, defValues).apply();
-            editor.commit();
+            if (prefs != null) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putStringSet(key, defValues).apply();
+                editor.commit();
+            }
             return this;
         }
 
 
         public String getString(String key, String defValue) {
-            return prefs.getString(key, defValue);
+            if (prefs != null) {
+                return prefs.getString(key, defValue);
+            }
+            return "";
         }
 
 
         public double getDouble(String key, String defValue) {
             double value = 0.00;
             try {
-                value = Double.parseDouble(prefs.getString(key, defValue));
+                if (prefs != null) {
+                    value = Double.parseDouble(prefs.getString(key, defValue));
+                }
             } catch (Exception e){
 
             }
@@ -223,65 +252,105 @@ public class XmlDB {
         }
 
         public String getString(String key) {
-            return prefs.getString(key, "");
+            if (prefs != null) {
+                return prefs.getString(key, "");
+            }
+            return "";
         }
 
         public int getInt(String key, int defValue) {
-            return prefs.getInt(key, defValue);
+            if (prefs != null) {
+                return prefs.getInt(key, defValue);
+            }
+            return defValue;
         }
 
         public int getInt(String key) {
-            return prefs.getInt(key, -1);
+            if (prefs != null) {
+                return prefs.getInt(key, -1);
+            }
+            return -1;
         }
 
         public long getLong(String key) {
-            return prefs.getLong(key, -1);
+            if (prefs != null) {
+                return prefs.getLong(key, -1);
+            }
+            return -1;
         }
 
         public long getLong(String key, long defValue) {
-            return prefs.getLong(key, defValue);
+            if (prefs != null) {
+                return prefs.getLong(key, defValue);
+            }
+            return defValue;
         }
 
         public float getFloat(String key) {
-            return prefs.getFloat(key, -1.0f);
+            if (prefs != null) {
+                return prefs.getFloat(key, -1.0f);
+            }
+            return -1.0f;
         }
 
         public float getFloat(String key, float defValue) {
-            return prefs.getFloat(key, defValue);
+            if (prefs != null) {
+                return prefs.getFloat(key, defValue);
+            }
+            return defValue;
         }
 
         public boolean getBoolean(String key) {
-            return prefs.getBoolean(key, false);
+            if (prefs != null) {
+                return prefs.getBoolean(key, false);
+            }
+            return false;
         }
 
         public boolean getBoolean(String key, boolean defValue) {
-            return prefs.getBoolean(key, defValue);
+            if (prefs != null) {
+                return prefs.getBoolean(key, defValue);
+            }
+            return defValue;
         }
 
         @TargetApi(Build.VERSION_CODES.M)
         public Set<String> getSet(String key) {
-            return prefs.getStringSet(key, new ArraySet());
+            if (prefs != null) {
+                return prefs.getStringSet(key, new ArraySet());
+            }
+            return new ArraySet<>();
         }
 
         public boolean contains(String key) {
-            return prefs.contains(key);
+            if (prefs != null) {
+                return prefs.contains(key);
+            }
+            return false;
         }
 
         public Map<String, ?> getAll() {
-            return prefs.getAll();
+            if (prefs != null) {
+                return prefs.getAll();
+            }
+            return new HashMap<>();
         }
 
         public void clear() {
-            SharedPreferences.Editor edit = prefs.edit();
-            edit.clear().apply();
-            edit.commit();
+            if (prefs != null) {
+                SharedPreferences.Editor edit = prefs.edit();
+                edit.clear().apply();
+                edit.commit();
+            }
         }
 
 
         public void remove(@NonNull String key) {
-            SharedPreferences.Editor edit = prefs.edit();
-            edit.remove(key).apply();
-            edit.commit();
+            if (prefs != null) {
+                SharedPreferences.Editor edit = prefs.edit();
+                edit.remove(key).apply();
+                edit.commit();
+            }
         }
 
     }

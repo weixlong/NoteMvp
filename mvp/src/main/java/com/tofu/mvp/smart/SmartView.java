@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -22,6 +21,7 @@ import com.tofu.mvp.gain.exception.ExceptionHandler;
 import com.tofu.mvp.gain.exception.UnKnowException;
 import com.tofu.mvp.gain.trust.SSLSocketClient;
 import com.tofu.mvp.util.CollectionUtils;
+import com.tofu.mvp.util.Print;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -422,12 +422,12 @@ public class SmartView<T> extends SmartRefreshLayout {
                             callback.isDrop = isRefresh;
                             isLastPage = callback.onSuccess(t, isRefresh);
                         } else {
-                            Log.e("smart", " json parse object error is null format json : \n" + s);
+                            Print.e( " json parse object error is null format json : \n" + s);
                             UnKnowException e = new UnKnowException("转换异常，请检查类型与数据格式", -101);
                             onErrorCallback(e);
                         }
                     } catch (Exception e) {
-                        Log.e("smart", " json parse object error is null format json : \n" + s);
+                        Print.e( " json parse object error is null format json : \n" + s);
                         onErrorCallback(e);
                     }
                 }
