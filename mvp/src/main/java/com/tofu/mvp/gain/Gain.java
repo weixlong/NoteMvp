@@ -190,7 +190,6 @@ public class Gain {
     public static <T> void load(Observable<T> observable, Callback<T> callback) {
         Class key = getCallClass();
         LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
-        Print.d(lifecycleProvider);
         if (lifecycleProvider != null) {
             load(lifecycleProvider, observable, callback);
         } else {
@@ -210,7 +209,6 @@ public class Gain {
     public static <T> void load(Observable<T> observable, Callback<T> callback,ActivityEvent event) {
         Class key = getCallClass();
         LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
-        Print.d(lifecycleProvider);
         if (lifecycleProvider != null) {
             load(lifecycleProvider, observable, callback,event);
         } else {

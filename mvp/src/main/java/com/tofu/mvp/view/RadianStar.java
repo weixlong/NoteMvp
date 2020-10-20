@@ -54,8 +54,8 @@ public class RadianStar extends LinearLayout {
 
     @SuppressLint("HandlerLeak")
     private void loadAttribute(Context context, AttributeSet attrs) {
-        starSize = DPUtil.dip2px(context,10);
-        h_margin = DPUtil.dip2px(context,10);
+        starSize = DPUtil.dip2px(10);
+        h_margin = DPUtil.dip2px(10);
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RadianStar);
             if (typedArray != null) {
@@ -68,6 +68,7 @@ public class RadianStar extends LinearLayout {
                 starSize = typedArray.getDimensionPixelSize(R.styleable.RadianStar_starSize, starSize);
                 autoHeight = typedArray.getBoolean(R.styleable.RadianStar_auto_height, false);
                 enableAnim = typedArray.getBoolean(R.styleable.RadianStar_enable_anim,false);
+                typedArray.recycle();
             }
         }
         setGravity(Gravity.CENTER_HORIZONTAL);

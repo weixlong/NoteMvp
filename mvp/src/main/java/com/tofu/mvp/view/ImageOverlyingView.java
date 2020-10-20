@@ -39,14 +39,15 @@ public class ImageOverlyingView extends RelativeLayout {
 
     private void setViewSettings(AttributeSet attrs) {
         setGravity(Gravity.CENTER_VERTICAL);
-        imageWidth = DPUtil.dip2px(getContext(), 20);
-        imageHeight = DPUtil.dip2px(getContext(), 20);
-        padding = DPUtil.dip2px(getContext(), 15);
+        imageWidth = DPUtil.dip2px(20);
+        imageHeight = DPUtil.dip2px( 20);
+        padding = DPUtil.dip2px( 15);
         if (attrs != null) {
             TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ImageOverlyingView);
             imageWidth = typedArray.getDimensionPixelSize(R.styleable.ImageOverlyingView_imageSize,imageWidth);
             padding = typedArray.getDimensionPixelSize(R.styleable.ImageOverlyingView_padding,padding);
             imageHeight = imageWidth;
+            typedArray.recycle();
         }
     }
 
