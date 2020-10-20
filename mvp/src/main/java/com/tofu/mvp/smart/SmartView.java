@@ -124,10 +124,21 @@ public class SmartView<T> extends SmartRefreshLayout {
         if (isAdd) {
             params.put(key, value.toString());
         } else {
-            boolean b = params.containsKey(key);
-            if (b) {
-                params.remove(key);
-            }
+            remove(key);
+        }
+        return this;
+    }
+
+
+    /**
+     * 移除参数
+     * @param key
+     * @return
+     */
+    public SmartView<T> remove(String key){
+        boolean b = params.containsKey(key);
+        if (b) {
+            params.remove(key);
         }
         return this;
     }
