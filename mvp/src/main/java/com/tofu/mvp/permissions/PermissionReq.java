@@ -77,13 +77,16 @@ public class PermissionReq {
                 if(permissionsFragment == null) {
                     permissionsFragment = new PermissionsFragment();
                     permissionsFragment.setBuilder(this);
-                    activity.getSupportFragmentManager().beginTransaction().add(permissionsFragment, "permissionsFragment").commitAllowingStateLoss();
+                    activity.getSupportFragmentManager().beginTransaction().add(permissionsFragment,"permissionsFragment").commitAllowingStateLoss();
                 }
-                permissionsFragment.requestPermissions(pers,reqCode,onPermissionResultCallback);
+                permissionsFragment.requestPermissions(activity,pers,reqCode,onPermissionResultCallback);
             }
         }
 
         public void release(){
+            if(activity != null){
+                activity.getSupportFragmentManager().beginTransaction().detach(permissionsFragment).commitAllowingStateLoss();
+            }
             activity = null;
             permissionsFragment = null;
             pers = null;

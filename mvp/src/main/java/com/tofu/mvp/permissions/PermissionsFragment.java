@@ -1,5 +1,6 @@
 package com.tofu.mvp.permissions;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -45,9 +46,9 @@ public class PermissionsFragment extends Fragment {
      * @param requestCode
      * @param callback
      */
-    public void requestPermissions(String[] permissions,int requestCode,OnPermissionResultCallback callback){
+    public void requestPermissions(Context context, String[] permissions, int requestCode, OnPermissionResultCallback callback){
         onPermissionResultCallback = callback;
-        if(PermissionReq.checkPermissions(getContext(),permissions)){
+        if(PermissionReq.checkPermissions(context,permissions)){
             onRequestPermissionsSuccess(requestCode);
         } else {
             requestPermissions(permissions,requestCode);

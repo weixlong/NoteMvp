@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.lxj.xpopup.XPopup;
 import com.lxj.xpopup.impl.LoadingPopupView;
+import com.lxj.xpopup.util.navbar.NavigationBarObserver;
 import com.tofu.mvp.MvpNote;
 import com.tofu.mvp.gain.convert.FastJsonConverterFactory;
 import com.tofu.mvp.gain.convert.ToStringConverterFactory;
@@ -436,6 +437,7 @@ public class Gain {
         private void dismissLoading() {
             if (popupView != null && popupView.isShow()) {
                 popupView.dismiss();
+                NavigationBarObserver.getInstance().removeOnNavigationBarListener(popupView);
                 popupView = null;
             }
         }
