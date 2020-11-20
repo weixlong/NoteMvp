@@ -8,6 +8,9 @@ import com.trello.rxlifecycle2.LifecycleProvider;
  */
 public class MvpNote {
 
+
+    public static boolean debug = true;
+
     /**
      * 绑定V层
      * @param v

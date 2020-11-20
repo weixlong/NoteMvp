@@ -51,7 +51,7 @@ public class Gain {
     private static class Instance {
         private static Option option = new Option();
         private static Gain request = new Gain();
-        private static HashMap<Class,Object> api = new HashMap<>();
+        private static HashMap<Class, Object> api = new HashMap<>();
     }
 
 
@@ -79,6 +79,7 @@ public class Gain {
 
     /**
      * 解绑生命周期跟随
+     *
      * @param key
      * @param <V>
      */
@@ -89,25 +90,26 @@ public class Gain {
 
     /**
      * 生命周期的接管，替换@GainLifecycle 里注解的生命周期key值
+     *
      * @param takeOverWho 被接管的key
-     * @param newKey 新的key
+     * @param newKey      新的key
      * @param <V>
      * @param <K>
      */
-    public static <V,K> void takeOverLifecycleToNewKey(Class<V> takeOverWho,Class<K> newKey){
-        Mvp.addTakeOverLifeKeyToNewKey(takeOverWho,newKey);
+    public static <V, K> void takeOverLifecycleToNewKey(Class<V> takeOverWho, Class<K> newKey) {
+        Mvp.addTakeOverLifeKeyToNewKey(takeOverWho, newKey);
     }
 
 
     /**
      * 取消生命周期接管，把接管的key 交还给@GainLifecycle 里的key
+     *
      * @param key 目前接管的key
      * @param <K>
      */
-    public static <K> void cancelTakeOverLifecycle(Class<K> key){
+    public static <K> void cancelTakeOverLifecycle(Class<K> key) {
         Mvp.removeTakeOverLifeKey(key);
     }
-
 
 
     /**
@@ -134,11 +136,11 @@ public class Gain {
      * @param observable
      * @param callback
      */
-    public static <T> void exe(Observable<T> observable, Callback<T> callback,ActivityEvent event) {
+    public static <T> void exe(Observable<T> observable, Callback<T> callback, ActivityEvent event) {
         Class key = getCallClass();
         LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
         if (lifecycleProvider != null) {
-            exe(lifecycleProvider, observable, callback,event);
+            exe(lifecycleProvider, observable, callback, event);
         } else {
             observable.compose(Gain.get().defaultSchedulers())
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
@@ -169,16 +171,15 @@ public class Gain {
      * @param observable
      * @param callback
      */
-    public static <T> void exe(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback,ActivityEvent event) {
+    public static <T> void exe(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback, ActivityEvent event) {
         if (lifecycleProvider != null) {
-            observable.compose(Gain.get().defaultSchedulers(lifecycleProvider,event))
+            observable.compose(Gain.get().defaultSchedulers(lifecycleProvider, event))
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
         } else {
             observable.compose(Gain.get().defaultSchedulers())
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
         }
     }
-
 
 
     /**
@@ -207,11 +208,11 @@ public class Gain {
      * @param observable
      * @param callback
      */
-    public static <T> void load(Observable<T> observable, Callback<T> callback,ActivityEvent event) {
+    public static <T> void load(Observable<T> observable, Callback<T> callback, ActivityEvent event) {
         Class key = getCallClass();
         LifecycleProvider lifecycleProvider = Mvp.getAnnotationLife(key);
         if (lifecycleProvider != null) {
-            load(lifecycleProvider, observable, callback,event);
+            load(lifecycleProvider, observable, callback, event);
         } else {
             observable.compose(Gain.get().defaultDialogSchedulers())
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
@@ -244,9 +245,9 @@ public class Gain {
      * @param observable
      * @param callback
      */
-    public static <T> void load(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback,ActivityEvent event) {
+    public static <T> void load(LifecycleProvider lifecycleProvider, Observable<T> observable, Callback<T> callback, ActivityEvent event) {
         if (lifecycleProvider != null) {
-            observable.compose(Gain.get().defaultDialogSchedulers(lifecycleProvider,event))
+            observable.compose(Gain.get().defaultDialogSchedulers(lifecycleProvider, event))
                     .subscribe(Gain.get().getSimpleSubscriber(callback));
         } else {
             observable.compose(Gain.get().defaultDialogSchedulers())
@@ -299,14 +300,16 @@ public class Gain {
         private Option() {
             if (builder == null) {
                 builder = new OkHttpClient.Builder()
-                        .addInterceptor(new HttpLoggingInterceptor()
-                                .setLevel(HttpLoggingInterceptor.Level.BODY))
                         .retryOnConnectionFailure(true)
                         .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())
                         .hostnameVerifier(SSLSocketClient.getHostnameVerifier())
                         .connectTimeout(HTTP_CONNECT_OUT_TIME, TimeUnit.SECONDS)
                         .writeTimeout(HTTP_CONNECT_OUT_TIME, TimeUnit.SECONDS)
                         .readTimeout(HTTP_CONNECT_OUT_TIME, TimeUnit.SECONDS);
+                if (MvpNote.debug) {
+                    builder.addInterceptor(new HttpLoggingInterceptor()
+                            .setLevel(HttpLoggingInterceptor.Level.BODY));
+                }
             }
         }
 
@@ -355,6 +358,7 @@ public class Gain {
 
         /**
          * 设置取消请求的生命周期
+         *
          * @param fragmentEvent
          * @return
          */
@@ -412,7 +416,7 @@ public class Gain {
          * 构建Retrofit
          */
         public void build() {
-            Instance.api.put(apiClass,createApi(apiClass, BASE_URL));
+            Instance.api.put(apiClass, createApi(apiClass, BASE_URL));
             ExceptionHandler.exceptionCallback(exceptionCallback);
         }
 
@@ -547,7 +551,7 @@ public class Gain {
      * @param lifecycleProvider
      * @return ObservableTransformer
      */
-    public <T> ObservableTransformer<T, T> defaultSchedulers(@NonNull LifecycleProvider lifecycleProvider,ActivityEvent event) {
+    public <T> ObservableTransformer<T, T> defaultSchedulers(@NonNull LifecycleProvider lifecycleProvider, ActivityEvent event) {
         if (lifecycleProvider instanceof RxFragmentActivity) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
@@ -607,7 +611,7 @@ public class Gain {
      * @param lifecycleProvider
      * @return ObservableTransformer
      */
-    public <T> ObservableTransformer<T, T> defaultDialogSchedulers(@NonNull final LifecycleProvider lifecycleProvider,ActivityEvent event) {
+    public <T> ObservableTransformer<T, T> defaultDialogSchedulers(@NonNull final LifecycleProvider lifecycleProvider, ActivityEvent event) {
         if (lifecycleProvider instanceof RxFragmentActivity) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())

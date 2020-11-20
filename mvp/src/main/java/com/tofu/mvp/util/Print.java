@@ -2,11 +2,13 @@ package com.tofu.mvp.util;
 
 import android.util.Log;
 
+import com.tofu.mvp.MvpNote;
+
 public class Print {
 
     private static String TAG = Print.class.getSimpleName();
 
-    public static boolean debug = true;
+    public static boolean debug = MvpNote.debug;
 
     private static int LENGTH = 2000;
 
