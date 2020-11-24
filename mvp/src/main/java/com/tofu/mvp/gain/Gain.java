@@ -439,7 +439,7 @@ public class Gain {
          * 关闭加载中
          */
         private void dismissLoading() {
-            if (popupView != null && popupView.isShow()) {
+            if (popupView != null) {
                 popupView.dismiss();
                 NavigationBarObserver.getInstance().removeOnNavigationBarListener(popupView);
                 popupView = null;
@@ -555,13 +555,13 @@ public class Gain {
         if (lifecycleProvider instanceof RxFragmentActivity) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
-                    .compose(lifecycleProvider.bindUntilEvent(event))
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .compose(lifecycleProvider.bindUntilEvent(event));
         } else if (lifecycleProvider instanceof RxFragment) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
-                    .compose(lifecycleProvider.bindUntilEvent(event))
-                    .observeOn(AndroidSchedulers.mainThread());
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .compose(lifecycleProvider.bindUntilEvent(event));
         }
         return defaultSchedulers();
     }
@@ -615,20 +615,20 @@ public class Gain {
         if (lifecycleProvider instanceof RxFragmentActivity) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .compose(lifecycleProvider.bindUntilEvent(event))
                     .doOnSubscribe((Consumer) disposable -> option().showLoading())
-                    .observeOn(AndroidSchedulers.mainThread())
                     .doFinally((Action) () -> {
                         option().dismissLoading();
                     });
         } else if (lifecycleProvider instanceof RxFragment) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .compose(lifecycleProvider.bindUntilEvent(event))
                     .doOnSubscribe(disposable -> {
                         option().showLoading();
                     })
-                    .observeOn(AndroidSchedulers.mainThread())
                     .doFinally((Action) () -> {
                         option().dismissLoading();
                     });
@@ -647,20 +647,20 @@ public class Gain {
         if (lifecycleProvider instanceof RxFragmentActivity) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .compose(lifecycleProvider.bindUntilEvent(Instance.option.event))
                     .doOnSubscribe((Consumer) disposable -> option().showLoading())
-                    .observeOn(AndroidSchedulers.mainThread())
                     .doFinally((Action) () -> {
                         option().dismissLoading();
                     });
         } else if (lifecycleProvider instanceof RxFragment) {
             return observable -> observable
                     .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .compose(lifecycleProvider.bindUntilEvent(Instance.option.fragmentEvent))
                     .doOnSubscribe(disposable -> {
                         option().showLoading();
                     })
-                    .observeOn(AndroidSchedulers.mainThread())
                     .doFinally((Action) () -> {
                         option().dismissLoading();
                     });
