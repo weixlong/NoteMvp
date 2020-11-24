@@ -327,6 +327,21 @@ public class Gain {
          */
         public Option addInterceptor(Interceptor interceptor) {
             builder.addInterceptor(interceptor);
+            return this;
+        }
+
+        /**
+         * 添加Smart拦截器<p>
+         * ● 不需要担心中间过程的响应,如重定向和重试.<p>
+         * ● 总是只调用一次,即使HTTP响应是从缓存中获取.<p>
+         * ● 观察应用程序的初衷. 不关心OkHttp注入的头信息如: If-None-Match.<p>
+         * ● 允许短路而不调用 Chain.proceed(),即中止调用.<p>
+         * ● 允许重试,使 Chain.proceed()调用多次.<p>
+         *
+         * @param interceptor
+         * @return Option
+         */
+        public Option addSmartInterceptor(Interceptor interceptor){
             SmartView.option().addInterceptor(interceptor);
             return this;
         }
@@ -344,6 +359,22 @@ public class Gain {
          */
         public Option addNetworkInterceptor(Interceptor interceptor) {
             builder.addNetworkInterceptor(interceptor);
+            SmartView.option().addNetworkInterceptor(interceptor);
+            return this;
+        }
+
+
+        /**
+         * 添加Smart网络拦截器<p>
+         * ● 能够操作中间过程的响应,如重定向和重试.<p>
+         * ● 当网络短路而返回缓存响应时不被调用.<p>
+         * ● 只观察在网络上传输的数据.<p>
+         * ● 携带请求来访问连接.<p>
+         *
+         * @param interceptor
+         * @return Option
+         */
+        public Option addSmartNetworkInterceptor(Interceptor interceptor) {
             SmartView.option().addNetworkInterceptor(interceptor);
             return this;
         }

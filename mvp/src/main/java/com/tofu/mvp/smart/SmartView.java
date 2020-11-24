@@ -15,6 +15,7 @@ import com.lzy.okgo.model.HttpParams;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshLoadMoreListener;
+import com.tofu.mvp.MvpNote;
 import com.tofu.mvp.R;
 import com.tofu.mvp.gain.Gain;
 import com.tofu.mvp.gain.exception.ExceptionHandler;
@@ -529,14 +530,16 @@ public class SmartView<T> extends SmartRefreshLayout {
 
         private Option() {
             builder = OkGo.getInstance().getOkHttpClientBuilder();
-            builder.addInterceptor(new HttpLoggingInterceptor()
-                    .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .retryOnConnectionFailure(true)
+            builder.retryOnConnectionFailure(true)
                     .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())
                     .hostnameVerifier(SSLSocketClient.getHostnameVerifier())
                     .connectTimeout(Gain.Option.getHttpConnectOutTime(), TimeUnit.SECONDS)
                     .writeTimeout(Gain.Option.getHttpConnectOutTime(), TimeUnit.SECONDS)
                     .readTimeout(Gain.Option.getHttpConnectOutTime(), TimeUnit.SECONDS);
+            if (MvpNote.debug) {
+                builder.addInterceptor(new HttpLoggingInterceptor()
+                        .setLevel(HttpLoggingInterceptor.Level.BODY));
+            }
         }
 
         /**
