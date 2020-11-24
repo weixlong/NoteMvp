@@ -305,7 +305,7 @@ public class SmartView<T> extends SmartRefreshLayout {
                 .writeTimeOut(Gain.Option.getHttpConnectOutTime() * 1000)
                 .readTimeOut(Gain.Option.getHttpConnectOutTime() * 1000)
                 .connTimeOut(Gain.Option.getHttpConnectOutTime() * 1000)
-                .upJson(JSONObject.toJSONString(params))
+                .params(params)
                 .setHostnameVerifier(SSLSocketClient.getHostnameVerifier())
                 //.addInterceptor(new AccessTokenInterceptor())
                 .headers(headers)
