@@ -53,6 +53,19 @@ public class PermissionReq {
             this.activity = activity;
         }
 
+
+        protected String[] getPers() {
+            return pers;
+        }
+
+        protected int getReqCode() {
+            return reqCode;
+        }
+
+        protected OnPermissionResultCallback getOnPermissionResultCallback() {
+            return onPermissionResultCallback;
+        }
+
         public Builder permissions(String... pers) {
             this.pers = pers;
             return this;
@@ -77,9 +90,10 @@ public class PermissionReq {
                 if(permissionsFragment == null) {
                     permissionsFragment = new PermissionsFragment();
                     permissionsFragment.setBuilder(this);
-                    activity.getSupportFragmentManager().beginTransaction().attach(permissionsFragment).commitAllowingStateLoss();
+                    activity.getSupportFragmentManager().beginTransaction().attach(permissionsFragment).show(permissionsFragment).commitAllowingStateLoss();
+                } else {
+                    permissionsFragment.requestPermissions(activity,pers,reqCode,onPermissionResultCallback);
                 }
-                permissionsFragment.requestPermissions(activity,pers,reqCode,onPermissionResultCallback);
             }
         }
 

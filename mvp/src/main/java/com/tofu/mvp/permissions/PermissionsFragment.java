@@ -22,6 +22,9 @@ public class PermissionsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if(builder != null){
+            requestPermissions(getContext(),builder.getPers(),builder.getReqCode(),builder.getOnPermissionResultCallback());
+        }
     }
 
     @Override
