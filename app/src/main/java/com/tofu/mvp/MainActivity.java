@@ -1,6 +1,7 @@
 package com.tofu.mvp;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -48,7 +49,7 @@ public class MainActivity extends BaseActivity implements MainContract.View, OnP
 
     @Override
     public void print(String s) {
-        view.setText(s);
+       // view.setText(s);
     }
 
     public void onPrintClick(View view) {
@@ -67,6 +68,7 @@ public class MainActivity extends BaseActivity implements MainContract.View, OnP
     @Override
     public void onRequestPermissionSuccess(int requestCode) {
         Print.e("onRequestPermissionSuccess");
+        startActivity(new Intent(this,MainActivity1.class));
     }
 
     @Override

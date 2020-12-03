@@ -18,7 +18,7 @@ public class App extends Application {
                 .build();
 
         Gain.option().api(ApiService1.class)
-                .baseUrl("http://www.julezhibo.com/yunbao/user/")
+                .baseUrl("https://api.xuanjige.net")
                 .okCode(0)
                 .setConnectOutTime(5)
                 .build();

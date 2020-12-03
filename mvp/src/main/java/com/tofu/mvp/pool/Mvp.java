@@ -1,5 +1,7 @@
 package com.tofu.mvp.pool;
 
+import com.tofu.mvp.base.BaseGainMvpFragmentLifecycle;
+import com.tofu.mvp.base.BaseGameMvpLifecycle;
 import com.tofu.mvp.gain.Gain;
 import com.tofu.mvp.note.GainApi;
 import com.tofu.mvp.note.GainLifecycle;
@@ -40,12 +42,20 @@ public class Mvp {
     /**
      * 生命周期跟随容器
      */
-    private static HashMap<Class,Class[]> attach = new HashMap<>();
+    private static HashMap<Class, Class[]> attach = new HashMap<>();
 
     /**
      * 生命周期接管
      */
-    private static HashMap<Class,Class> takeoverKeys = new HashMap<>();
+    private static HashMap<Class, Class> takeoverKeys = new HashMap<>();
+
+    /**
+     * 生命周期事件
+     */
+    private static HashMap<Class, Class> lifecycleKeys = new HashMap<>();
+
+
+
 
     /**
      * @param v 绑定一个实体View 实现 ，如：Activity,Fragment等。
@@ -91,7 +101,6 @@ public class Mvp {
         }
     }
 
-
     /**
      * 解析P层
      *
@@ -113,22 +122,53 @@ public class Mvp {
 
 
     private static <V> void startParseBindAnnotation(V v, Class<?>[] target_vs, Class<?>[] target_ps, Class<?>[] target_ms) {
-        List<Field> fields = scanField(v,v);
+        List<Field> fields = scanField(v, v);
+
+        if (v instanceof LifecycleProvider) {
+            addLife(v.getClass(), null, (LifecycleProvider) v);
+        }
+
         setAnnotation(v, v, fields, target_vs, target_ps, target_ms);
+
+        addObservableEvent(v.getClass(), v);
+
         for (int i = 0; i < target_ps.length; i++) {
             PO po = container.get(target_ps[i]);
-            List<Field> fieldps = scanField(v,po.object);
+            List<Field> fieldps = scanField(v, po.object);
             setAnnotation(v, po.object, fieldps, target_vs, target_ps, target_ms);
+            addObservableEvent(v.getClass(), po.object);
         }
         for (int i = 0; i < target_ms.length; i++) {
             PO po = container.get(target_ms[i]);
-            List<Field> fieldms = scanField(v,po.object);
+            List<Field> fieldms = scanField(v, po.object);
             setAnnotation(v, po.object, fieldms, target_vs, target_ps, target_ms);
+            addObservableEvent(v.getClass(), po.object);
         }
-        if (v instanceof LifecycleProvider) {
-            addLife(v.getClass(), null,  (LifecycleProvider) v);
+
+
+    }
+
+
+    /**
+     * 添加生命周期事件监听
+     *
+     * @param key
+     * @param
+     * @param
+     */
+    private static void addObservableEvent(Class key, Object o) {
+        LifecycleProvider life = getAnnotationLife(o.getClass());
+        if (life != null) {
+            if (o instanceof BaseGainMvpFragmentLifecycle) {
+                BaseGainMvpFragmentLifecycle callback = (BaseGainMvpFragmentLifecycle) o;
+                LifecycleObservable.get().observableFragmentEvent(key,life.lifecycle(), callback);
+            } else if (o instanceof BaseGameMvpLifecycle) {
+                BaseGameMvpLifecycle callback  = (BaseGameMvpLifecycle) o;
+                LifecycleObservable.get().observableActivityEvent(key,life.lifecycle(), callback);
+            }
         }
     }
+
 
 
     private static <V> void setAnnotation(V v, Object o, List<Field> fields, Class<?>[] target_vs, Class<?>[] target_ps, Class<?>[] target_ms) {
@@ -178,9 +218,10 @@ public class Mvp {
      * @param o
      * @return
      */
-    private static <V> List<Field> scanField(V v,Object o) {
+    private static <V> List<Field> scanField(V v, Object o) {
         List<Field> afields = new ArrayList<>();
         Field[] fields = o.getClass().getDeclaredFields();
+        scanLifecycle(o.getClass());
         for (int i = 0; i < fields.length; i++) {
 
             Field field = fields[i];
@@ -200,6 +241,22 @@ public class Mvp {
 
         }
         return afields;
+    }
+
+
+    private static void scanLifecycle(Class t) {
+        Annotation[] annotations = t.getAnnotations();
+        if (annotations != null || annotations.length >= 0) {
+            for (int i = 0; i < annotations.length; i++) {
+                Annotation annotation = annotations[i];
+                if (annotation instanceof GainLifecycle) {
+                    GainLifecycle lifecycle = (GainLifecycle) annotation;
+                    Class key = lifecycle.lifeKey();
+                    lifecycleKeys.put(t, key);
+                    return;
+                }
+            }
+        }
     }
 
 
@@ -236,18 +293,12 @@ public class Mvp {
      * @return
      */
     public static LifecycleProvider getAnnotationLife(Class t) {
-        Annotation[] annotations = t.getAnnotations();
-        if (annotations != null || annotations.length >= 0) {
-            for (int i = 0; i < annotations.length; i++) {
-                Annotation annotation = annotations[i];
-                if (annotation instanceof GainLifecycle) {
-                    GainLifecycle lifecycle = (GainLifecycle) annotation;
-                    Class key = lifecycle.lifeKey();
-                    LifecycleProvider life = getLife(key);
-                    if (life != null) {
-                        return life;
-                    }
-                }
+        boolean b = lifecycleKeys.containsKey(t);
+        if (b) {
+            Class key = lifecycleKeys.get(t);
+            LifecycleProvider life = getLife(key);
+            if (life != null) {
+                return life;
             }
         }
         return findLifecycleProviderAttach(t);
@@ -256,14 +307,15 @@ public class Mvp {
 
     /**
      * 添加生命周期跟随
+     *
      * @param key
      * @param ats
      */
-    public static void addLifeAttach(Class key,Class[] ats){
-        if(ats != null && ats.length>0){
-            if(attach.containsKey(key)){
+    public static void addLifeAttach(Class key, Class[] ats) {
+        if (ats != null && ats.length > 0) {
+            if (attach.containsKey(key)) {
                 Class[] concat = concat(attach.get(key), ats);
-                attach.put(key,concat);
+                attach.put(key, concat);
             } else {
                 attach.put(key, ats);
             }
@@ -271,17 +323,17 @@ public class Mvp {
     }
 
 
-    public static void addTakeOverLifeKeyToNewKey(Class k,Class k1){
+    public static void addTakeOverLifeKeyToNewKey(Class k, Class k1) {
         takeoverKeys.put(k, k1);
     }
 
 
-    public static void removeTakeOverLifeKey(Class k){
-        if(takeoverKeys.containsValue(k)){
+    public static void removeTakeOverLifeKey(Class k) {
+        if (takeoverKeys.containsValue(k)) {
             Iterator<Map.Entry<Class, Class>> iterator = takeoverKeys.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<Class, Class> next = iterator.next();
-                if(next.getValue() == k){
+                if (next.getValue() == k) {
                     takeoverKeys.remove(next.getKey());
                     return;
                 }
@@ -297,13 +349,13 @@ public class Mvp {
     }
 
 
-    private static LifecycleProvider findLifecycleProviderAttach(Class t){
+    private static LifecycleProvider findLifecycleProviderAttach(Class t) {
         Iterator<Map.Entry<Class, Class[]>> iterator = attach.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Class, Class[]> next = iterator.next();
             Class[] value = next.getValue();
             for (int i = 0; i < value.length; i++) {
-                if(t == value[i]){
+                if (t == value[i]) {
                     if (lps.containsKey(next.getKey())) {
                         return lps.get(next.getKey()).life;
                     }
@@ -314,7 +366,6 @@ public class Mvp {
     }
 
 
-
     /**
      * 获得已注册的生命周期对象
      *
@@ -322,9 +373,9 @@ public class Mvp {
      * @return
      */
     public static LifecycleProvider getLife(Class key) {
-        if(takeoverKeys.containsKey(key)){
+        if (takeoverKeys.containsKey(key)) {
             Class newKey = takeoverKeys.get(key);
-            if(newKey != null){
+            if (newKey != null) {
                 if (lps.containsKey(newKey)) {
                     return lps.get(newKey).life;
                 }
@@ -347,7 +398,7 @@ public class Mvp {
             LFP lfp = lps.get(key);
             lfp.life = null;
             lfp.main = null;
-            if(lfp.with != null){
+            if (lfp.with != null) {
                 for (int i = 0; i < lfp.with.length; i++) {
                     lfp.with[i] = null;
                 }
@@ -363,7 +414,7 @@ public class Mvp {
      * @param life
      */
     public static void addLife(Class key, Class[] with, LifecycleProvider life) {
-        if(!lps.containsKey(key)) {
+        if (!lps.containsKey(key)) {
             LFP lfp = new LFP(key, with, life);
             lps.put(key, lfp);
         }
@@ -405,7 +456,7 @@ public class Mvp {
             if (api == null) {
                 Print.e("Gain api is null, please init Gain and set api class.");
             } else {
-                Print.d("user api "+field.getType());
+                Print.d("user api " + field.getType());
                 field.setAccessible(true);
                 field.set(o, api);
                 field.setAccessible(false);
@@ -453,6 +504,11 @@ public class Mvp {
      * @param <V>
      */
     public static <V> void unBind(Class<V> v) {
+
+        LifecycleObservable.get().unAttachLifecycle(v);
+
+        removeTakeOverLifeKey(v);
+
         if (container.containsKey(v) || container.get(v) != null) {
             PO po = container.get(v);
             po.object = null;
@@ -479,9 +535,10 @@ public class Mvp {
     }
 
 
-    public static void unAttachLife(Class key){
+    public static void unAttachLife(Class key) {
+        LifecycleObservable.get().unAttachLifecycle(key);
         boolean b = attach.containsKey(key);
-        if(b)attach.remove(key);
+        if (b) attach.remove(key);
     }
 
 

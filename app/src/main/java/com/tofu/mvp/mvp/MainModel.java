@@ -28,7 +28,8 @@ public class MainModel implements MainContract.Model {
 
     @Override
     public void getValue1(Callback<String> callback) {
-        Gain.load(api1.getUser(), callback);
+        Gain.load(api1.getUser("Home.getConfig"), callback);
+
     }
 
 

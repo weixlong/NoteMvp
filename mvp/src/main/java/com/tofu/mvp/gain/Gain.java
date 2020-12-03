@@ -12,6 +12,7 @@ import com.tofu.mvp.gain.convert.FastJsonConverterFactory;
 import com.tofu.mvp.gain.convert.ToStringConverterFactory;
 import com.tofu.mvp.gain.exception.ExceptionHandler;
 import com.tofu.mvp.gain.trust.SSLSocketClient;
+import com.tofu.mvp.pool.LifecycleObservable;
 import com.tofu.mvp.pool.Mvp;
 import com.tofu.mvp.smart.SmartView;
 import com.tofu.mvp.util.ActivityManager;
@@ -697,6 +698,12 @@ public class Gain {
                     });
         }
         return defaultDialogSchedulers();
+    }
+
+
+
+    private void addActivityEventObservable(LifecycleProvider lifecycleProvider){
+        LifecycleObservable.get();
     }
 
 

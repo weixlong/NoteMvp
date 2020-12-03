@@ -66,6 +66,7 @@ public class PermissionsFragment extends DialogFragment {
     private void onRequestPermissionsSuccess(int requestCode){
         if(onPermissionResultCallback != null){
             onPermissionResultCallback.onRequestPermissionSuccess(requestCode);
+            dismissAllowingStateLoss();
         }
     }
 
@@ -77,6 +78,7 @@ public class PermissionsFragment extends DialogFragment {
     private void onRequestPermissionsFailed(int requestCode){
         if(onPermissionResultCallback != null){
             onPermissionResultCallback.onRequestPermissionFailed(requestCode);
+            dismissAllowingStateLoss();
         }
     }
 
