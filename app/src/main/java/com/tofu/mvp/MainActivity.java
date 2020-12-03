@@ -1,5 +1,6 @@
 package com.tofu.mvp;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import com.tofu.mvp.note.PMTarget;
 import com.tofu.mvp.note.Presenter;
 import com.tofu.mvp.permissions.OnPermissionResultCallback;
 import com.tofu.mvp.permissions.PermissionReq;
+import com.tofu.mvp.util.Print;
 
 
 @PMTarget(p = {MainPresenter.class, Main1Presenter.class},m = {MainModel.class, Main1Model.class})
@@ -35,11 +37,7 @@ public class MainActivity extends BaseActivity implements MainContract.View, OnP
     @Override
     protected void onCreateBindViewChanged(@Nullable Bundle savedInstanceState) {
         MvpNote.bind(this);
-        PermissionReq.instance(this)
-                .permissions()
-                .requestCode(123)
-                .callback(this)
-                .req();
+
     }
 
     @Override
@@ -58,13 +56,21 @@ public class MainActivity extends BaseActivity implements MainContract.View, OnP
         presenter.print();
     }
 
+    public void onReqPermission(View v){
+        PermissionReq.instance(this)
+                .permissions(Manifest.permission.CALL_PHONE)
+                .requestCode(123)
+                .callback(this)
+                .req();
+    }
+
     @Override
     public void onRequestPermissionSuccess(int requestCode) {
-
+        Print.e("onRequestPermissionSuccess");
     }
 
     @Override
     public void onRequestPermissionFailed(int requestCode) {
-
+        Print.e("onRequestPermissionFailed");
     }
 }

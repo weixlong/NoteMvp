@@ -90,7 +90,7 @@ public class PermissionReq {
                 if(permissionsFragment == null) {
                     permissionsFragment = new PermissionsFragment();
                     permissionsFragment.setBuilder(this);
-                    activity.getSupportFragmentManager().beginTransaction().attach(permissionsFragment).show(permissionsFragment).commitAllowingStateLoss();
+                    permissionsFragment.show(activity.getSupportFragmentManager(),"permissionsFragment");
                 } else {
                     permissionsFragment.requestPermissions(activity,pers,reqCode,onPermissionResultCallback);
                 }

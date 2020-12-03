@@ -7,13 +7,14 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.DialogFragment;
 
-public class PermissionsFragment extends Fragment {
+public class PermissionsFragment extends DialogFragment {
 
     private OnPermissionResultCallback onPermissionResultCallback;
 
     private PermissionReq.Builder builder;
+
 
     public void setBuilder(PermissionReq.Builder builder) {
         this.builder = builder;
