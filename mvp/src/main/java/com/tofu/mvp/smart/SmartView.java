@@ -87,8 +87,9 @@ public class SmartView<T> extends SmartRefreshLayout {
             beanName = typedArray.getString(R.styleable.SmartView_bean);
             pageKey = typedArray.getString(R.styleable.SmartView_pageKey);
             url = typedArray.getString(R.styleable.SmartView_url);
-            start_page_index = typedArray.getIndex(R.styleable.SmartView_start_page);
-            page = start_page_index;
+            int p = typedArray.getIndex(R.styleable.SmartView_start_page);
+            start_page_index = p;
+            page = p;
             typedArray.recycle();
         }
     }
@@ -508,7 +509,9 @@ public class SmartView<T> extends SmartRefreshLayout {
      * 销毁
      */
     private void onDestroy() {
-        OkGo.getInstance().cancelTag(url);
+        if(!TextUtils.isEmpty(url)) {
+            OkGo.getInstance().cancelTag(url);
+        }
         start_page_index = 0;
         page = 0;
         isRefresh = true;
