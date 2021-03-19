@@ -302,7 +302,7 @@ public class Gain {
             if (builder == null) {
                 builder = new OkHttpClient.Builder()
                         .retryOnConnectionFailure(true)
-                        .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())
+                        .sslSocketFactory(SSLSocketClient.getSSLSocketFactory(),SSLSocketClient.getX509TrustManager())
                         .hostnameVerifier(SSLSocketClient.getHostnameVerifier())
                         .connectTimeout(HTTP_CONNECT_OUT_TIME, TimeUnit.SECONDS)
                         .writeTimeout(HTTP_CONNECT_OUT_TIME, TimeUnit.SECONDS)

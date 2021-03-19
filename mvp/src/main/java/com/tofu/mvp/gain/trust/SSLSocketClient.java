@@ -1,6 +1,7 @@
 package com.tofu.mvp.gain.trust;
 
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
@@ -46,6 +47,27 @@ public class SSLSocketClient {
                 }
         };
         return trustAllCerts;
+    }
+
+
+    public static X509TrustManager getX509TrustManager(){
+        return new X509TrustManager(){
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+            }
+
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+        };
     }
 
     //获取HostnameVerifier
